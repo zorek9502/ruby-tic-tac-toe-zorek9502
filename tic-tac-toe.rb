@@ -1,5 +1,5 @@
 require "Matrix"
-
+require_relative "player"
 #Estructura del tablero
 #   |   |
 #---|---|---
@@ -14,27 +14,118 @@ require "Matrix"
 #c [   ,    ,  ]
 
 class TicTacToe
-  tablero = Matrix[[], [], []]
+  @tablero
   attr_reader :cruz, :bola
 
   def initialize
     @cruz = "X"
     @bola = "O"
+    @tablero = Matrix[["e", "e", "e"], ["e", "e", "e"], ["e", "e", "e"]]
+    @player1 = Player.new
+    @player2 = Player.new
   end
 
-  def game_menu
+  def game_intro
+    print "#####################################################################################################################\n"
+    print "#####################################################################################################################\n"
+    print "######          ####        ####       ####          ######   #######       ###          ###         ###       ######\n"
+    print "##########  ###########  #######  #############  #########  ##  #####  ############  #######  #####  ###  ###########\n"
+    print "##########  ###########  #######  #############  #######  ######  ###  ############  #######  #####  ###     ########\n"
+    print "##########  ###########  #######  #############  #######          ###  ############  #######  #####  ###  ###########\n"
+    print "##########  ########        ####       ########  #######  ######  ###       #######  #######         ###       ######\n"
+    print "#####################################################################################################################\n"
+    print "#####################################################################################################################\n\n"
+    puts "Bienvenidos al juego"
+    puts
+    puts "Las reglas son muy sencillas"
+    puts "1.- Hay 2 jugadores uno con la ficha X y otro con O."
+    puts "2.- La primera vez que inicia el juego el jugador que elija la X comienza y se va alternando."
+    puts "3.- El juego termina cuando uno de los 2 logre tener 3 de sus fichas en diagonal, horizontal o vertical"
+    puts "4.- Cuando el juego termine y quieran jugar de nuevo, el jugador que perdio la partida anterior comienza"
+    puts "5.- En caso de empate, el jugador que hizo el segundo segundo movimiento comienza."
+    puts "Got it? right..."
+    puts "A continuacion te muestro el tablero, esta compuesto por coordenadas, letras en las filas y numeros en las columnas\n\n"
+    #print "    1   2   3\n"
+    #print "A [   ,    ,  ]\n"
+    #print "B [   ,    ,  ]\n"
+    #print "C [   ,    ,  ]\n"
+
+    print "   1   2   3\n"
+    print "A    |   |   \n"
+    print "  ---|---|---\n"
+    print "B    |   |   \n"
+    print "  ---|---|---\n"
+    print "C    |   |   \n"
+
+    puts "\nDeberas ingresar la posicion en la que deseas poner tu ficha separados por ','"
+    puts "por ejemplo quieres poner X en A,3 y un O en B,2"
+    puts
+    print "   1   2   3\n"
+    print "A    |   | X \n"
+    print "  ---|---|---\n"
+    print "B    | O |   \n"
+    print "  ---|---|---\n"
+    print "C    |   |   \n"
+    puts
+    puts "Ya que hablamos de fichas, porque no me dicen que ficha van a querer y su nombre?"
   end
 
-  def turn_capture
+  def player_choose
+    puts "Player 1 dame tu nombre"
+    @player1.nombre = gets.chomp
+    puts "Hola #{@player1.nombre}"
+    sleep 1
+    puts "Player 2 dame tu nombre"
+    @player2.nombre = gets.chomp
+    puts "Hola #{@player2.nombre}"
+    sleep 1
+    puts "Perfecto, #{@player1.nombre} dime que ficha escojes? X o O"
+    ficha = gets.chomp.downcase
+    if ficha == "x"
+      puts "Bien tu seras el primero en elegir"
+      sleep 1
+      puts "#{@player2.nombre} tu ficha sera O"
+      @player1.ficha = "X"
+      @player2.ficha = "O"
+    elsif ficha == "o"
+      puts "Muy bien"
+      sleep 1
+      puts "#{@player2.nombre} tu ficha sera X y seras el primero en elejir"
+      @player1.ficha = "O"
+      @player2.ficha = "X"
+    else
+      puts "m m m m m m"
+      sleep 1
+      puts "Creei que leyeron bien las reglas ¬_¬ solo se puede X o O"
+      sleep 1
+      puts "De castigo yo eligire por ustedes"
+      sleep 1
+      puts "#{@player1.nombre} tu seras O y #{@player2.nombre} sera X"
+      @player1.ficha = "O"
+      @player2.ficha = "X"
+    end
+    sleep 1
+    puts "Si les parece bien comenzemos el juego :)"
+  end
+
+  def turn_capture(player)
     valid = false
+    turno = []
     loop do
-      puts "Ingresa coordenas y tu ficha, ej: A,3 o C,2"
+      puts "Dame las coordenadas de tu jugada"
       turno = gets.chomp.downcase.split(",") #Captura las coordenadas del jugador, elimina el salto de linea, cambia los caracteres a minusculas y los separa en un el arreglo turno
+
+      #mover a main
       valid = turn_valid? turno
       break if valid
       unless valid
-        puts "Datos no validos, favor de ingresar unicamente los siguentes caracteres a,b,c,1,2 o 3"
+        puts "Mi estimado, eso no se puede :(, solo se puede ingresar los siguentes caracteres a,b,c para las filas y 1,2,3 para columnas"
       end
+    end
+    #Mover a main
+    if insert_play_on_board player, turno
+      return true
+    else
     end
   end
 
@@ -63,8 +154,24 @@ class TicTacToe
       end
     end
   end
+
+  def insert_play_on_board(player, turno)
+    if turno[0].to_i == 0
+      row_pos = turno[0] == "a" ? 0 : turno[0] == "b" ? 1 : turno[0] == "c" ? 2 : 3
+    else
+      row_pos = turno[1] == "a" ? 0 : turno[1] == "b" ? 1 : turno[1] == "c" ? 2 : 3
+    end
+    col_pos = (turno[0].to_i != 0 ? turno[0].to_i : turno[1].to_i) - 1
+
+    unless @tablero.component(row_pos, col_pos) != "e"
+      @tablero.send(:[]=, row_pos, col_pos, player.ficha)
+    else
+      puts "Lo siento ese lugar esta ocupado krnal"
+      return false
+    end
+  end
 end
 
-game = TicTacToe.new
+#game = TicTacToe.new
 
-game.turn_capture
+#game.turn_capture
