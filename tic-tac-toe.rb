@@ -117,7 +117,6 @@ class TicTacToe
     loop do
       puts "Dame las coordenadas de tu jugada #{player.nombre.capitalize}"
       turno = gets.chomp.downcase.split(",") #Captura las coordenadas del jugador, elimina el salto de linea, cambia los caracteres a minusculas y los separa en un el arreglo turno
-
       #mover a main
       valid = turn_valid? turno
       break if valid
@@ -125,11 +124,7 @@ class TicTacToe
         puts "Mi estimado, eso no se puede :(, solo se puede ingresar los siguentes caracteres a,b,c para las filas y 1,2,3 para columnas"
       end
     end
-    #Mover a main
-    if insert_play_on_board player, turno
-      return true
-    else
-    end
+    turno
   end
 
   def turn_valid?(turno)
@@ -168,6 +163,7 @@ class TicTacToe
 
     unless @tablero.component(row_pos, col_pos) != ""
       @tablero.send(:[]=, row_pos, col_pos, player.ficha)
+      return true
     else
       puts "Lo siento ese lugar esta ocupado krnal"
       return false
@@ -184,15 +180,19 @@ class TicTacToe
   end
 
   def full_board?
-    resp = false
+    blank_space = false
     @tablero.each do |n|
       if n == ""
-        resp = false
+        puts "blank"
+        blank_space = true
       else
-        resp = true
+        puts n
       end
     end
-    resp
+    blank_space ? false : true
+  end
+
+  def match()
   end
 end
 
