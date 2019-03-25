@@ -20,21 +20,19 @@ class TicTacToe
   def initialize
     @cruz = "X"
     @bola = "O"
-    @tablero = Matrix[["e", "e", "e"], ["e", "e", "e"], ["e", "e", "e"]]
-    @player1 = Player.new
-    @player2 = Player.new
+    @tablero = Matrix[["", "", ""], ["", "", ""], ["", "", ""]]
   end
 
   def game_intro
-    print "#####################################################################################################################\n"
-    print "#####################################################################################################################\n"
-    print "######          ####        ####       ####          ######   #######       ###          ###         ###       ######\n"
-    print "##########  ###########  #######  #############  #########  ##  #####  ############  #######  #####  ###  ###########\n"
-    print "##########  ###########  #######  #############  #######  ######  ###  ############  #######  #####  ###     ########\n"
-    print "##########  ###########  #######  #############  #######          ###  ############  #######  #####  ###  ###########\n"
-    print "##########  ########        ####       ########  #######  ######  ###       #######  #######         ###       ######\n"
-    print "#####################################################################################################################\n"
-    print "#####################################################################################################################\n\n"
+    print "*********************************************************************************************************************\n"
+    print "*###################################################################################################################*\n"
+    print "*#####          ####        ####       ####          ######   #######       ###          ###         ###       #####*\n"
+    print "*#########  ###########  #######  #############  #########  ##  #####  ############  #######  #####  ###  ##########*\n"
+    print "*#########  ###########  #######  #############  #######  ######  ###  ############  #######  #####  ###     #######*\n"
+    print "*#########  ###########  #######  #############  #######          ###  ############  #######  #####  #q##  ##########*\n"
+    print "*#########  ########        ####       ########  #######  ######  ###       #######  #######         ###       #####*\n"
+    print "*###################################################################################################################*\n"
+    print "*********************************************************************************************************************\n\n"
     puts "Bienvenidos al juego"
     puts
     puts "Las reglas son muy sencillas"
@@ -70,29 +68,32 @@ class TicTacToe
     puts "Ya que hablamos de fichas, porque no me dicen que ficha van a querer y su nombre?"
   end
 
-  def player_choose
+  def player_choose(player1, player2)
+    player_s = nil
     puts "Player 1 dame tu nombre"
-    @player1.nombre = gets.chomp
-    puts "Hola #{@player1.nombre}"
+    player1.nombre = gets.chomp
+    puts "Hola #{player1.nombre}"
     sleep 1
     puts "Player 2 dame tu nombre"
-    @player2.nombre = gets.chomp
-    puts "Hola #{@player2.nombre}"
+    player2.nombre = gets.chomp
+    puts "Hola #{player2.nombre}"
     sleep 1
-    puts "Perfecto, #{@player1.nombre} dime que ficha escojes? X o O"
+    puts "Perfecto, #{player1.nombre} dime que ficha escojes? X o O"
     ficha = gets.chomp.downcase
     if ficha == "x"
       puts "Bien tu seras el primero en elegir"
       sleep 1
-      puts "#{@player2.nombre} tu ficha sera O"
-      @player1.ficha = "X"
-      @player2.ficha = "O"
+      puts "#{player2.nombre} tu ficha sera O"
+      player1.ficha = "X"
+      player2.ficha = "O"
+      player_s = player1
     elsif ficha == "o"
       puts "Muy bien"
       sleep 1
-      puts "#{@player2.nombre} tu ficha sera X y seras el primero en elejir"
-      @player1.ficha = "O"
-      @player2.ficha = "X"
+      puts "#{player2.nombre} tu ficha sera X y seras el primero en elejir"
+      player1.ficha = "O"
+      player2.ficha = "X"
+      player_s = player2
     else
       puts "m m m m m m"
       sleep 1
@@ -100,19 +101,21 @@ class TicTacToe
       sleep 1
       puts "De castigo yo eligire por ustedes"
       sleep 1
-      puts "#{@player1.nombre} tu seras O y #{@player2.nombre} sera X"
-      @player1.ficha = "O"
-      @player2.ficha = "X"
+      puts "#{player1.nombre} tu seras O y #{player2.nombre} sera X"
+      player1.ficha = "O"
+      player2.ficha = "X"
+      player_s = player2
     end
     sleep 1
     puts "Si les parece bien comenzemos el juego :)"
+    return player_s
   end
 
   def turn_capture(player)
     valid = false
     turno = []
     loop do
-      puts "Dame las coordenadas de tu jugada"
+      puts "Dame las coordenadas de tu jugada #{player.nombre.capitalize}"
       turno = gets.chomp.downcase.split(",") #Captura las coordenadas del jugador, elimina el salto de linea, cambia los caracteres a minusculas y los separa en un el arreglo turno
 
       #mover a main
@@ -163,12 +166,33 @@ class TicTacToe
     end
     col_pos = (turno[0].to_i != 0 ? turno[0].to_i : turno[1].to_i) - 1
 
-    unless @tablero.component(row_pos, col_pos) != "e"
+    unless @tablero.component(row_pos, col_pos) != ""
       @tablero.send(:[]=, row_pos, col_pos, player.ficha)
     else
       puts "Lo siento ese lugar esta ocupado krnal"
       return false
     end
+  end
+
+  def print_board
+    print "   1   2   3\n"
+    print "A  #{@tablero.component(0, 0)}  | #{@tablero.component(0, 1)}  | #{@tablero.component(0, 2)}  \n"
+    print "  ---|---|---\n"
+    print "B  #{@tablero.component(1, 0)}  | #{@tablero.component(1, 1)}  | #{@tablero.component(1, 2)}  \n"
+    print "  ---|---|---\n"
+    print "C  #{@tablero.component(2, 0)}  | #{@tablero.component(2, 1)}  | #{@tablero.component(2, 2)}  \n"
+  end
+
+  def full_board?
+    resp = false
+    @tablero.each do |n|
+      if n == ""
+        resp = false
+      else
+        resp = true
+      end
+    end
+    resp
   end
 end
 
