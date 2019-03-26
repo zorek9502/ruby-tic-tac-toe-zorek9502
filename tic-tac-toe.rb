@@ -194,7 +194,28 @@ class TicTacToe
 
   def match()
   end
+
+  def match_row_col(orientation)
+    tree_match = false
+    row_cols = orientation == "r" ? @tablero.row_vectors() : @tablero.column_vectors()
+    row_cols.each do |x|
+      print "\t\n #{x[0]}, #{x[1]}, #{x[2]}\n"
+      if x[0] == x[1]
+        if x[1] == x[2]
+          print "\t\n\n\n #{x[0]}, #{x[1]}, #{x[2]}\n\n\n"
+          return true
+        else
+          tree_match = false
+        end
+      else
+        tree_match = false
+      end
+    end
+    return tree_match
+  end
 end
+
+#@tablero = Matrix[["x", "x", "o"], ["x", "o", "o"], ["o", "x", "o"]]
 
 #game = TicTacToe.new
 
