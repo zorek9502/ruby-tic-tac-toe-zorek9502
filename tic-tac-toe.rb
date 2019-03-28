@@ -2,13 +2,13 @@ require "Matrix"
 require_relative "player"
 #Estructura del tablero
 #   |   |
-#---|---|---
+#--- --- ---
 #   |   |
-#---|---|---
+#--- --- ---
 #   |   |
 
 #Estructura de coordenadas de tablero
-#    1   2   3
+#    1   2   3 ...
 #a [   ,    ,  ]
 #b [   ,    ,  ]
 #c [   ,    ,  ]
@@ -20,8 +20,7 @@ class TicTacToe
   def initialize(n)
     @cruz = "X"
     @bola = "O"
-    #@tablero = Matrix[["", "", ""], ["", "", ""], ["", "", ""]]
-    @tablero = Matrix.build(n) { "" }
+    @tablero = Matrix.build(n) { " " }
   end
 
   def game_intro
@@ -44,26 +43,22 @@ class TicTacToe
     puts "5.- En caso de empate, el jugador que hizo el segundo segundo movimiento comienza."
     puts "Got it? right..."
     puts "A continuacion te muestro un tablero de 3x3, esta compuesto por coordenadas, letras en las filas y numeros en las columnas\n\n"
-    #print "    1   2   3\n"
-    #print "A [   ,    ,  ]\n"
-    #print "B [   ,    ,  ]\n"
-    #print "C [   ,    ,  ]\n"
-
+    puts
     print "   1   2   3\n"
     print "A    |   |   \n"
-    print "  ---|---|---\n"
+    print "  --- --- ---\n"
     print "B    |   |   \n"
-    print "  ---|---|---\n"
+    print "  --- --- ---\n"
     print "C    |   |   \n"
-
+    puts
     puts "\nDeberas ingresar la posicion en la que deseas poner tu ficha separados por ','"
     puts "por ejemplo quieres poner X en A,3 y un O en B,2"
     puts
     print "   1   2   3\n"
     print "A    |   | X \n"
-    print "  ---|---|---\n"
+    print "  --- --- ---\n"
     print "B    | O |   \n"
-    print "  ---|---|---\n"
+    print "  --- --- ---\n"
     print "C    |   |   \n"
     puts
     puts "Ya que hablamos de fichas, porque no me dicen que ficha van a querer y su nombre?"
@@ -107,7 +102,8 @@ class TicTacToe
       player2.ficha = "X"
       player_s = player2
     end
-    sleep 1
+    sleep 2
+    system("cls")
     puts "Si les parece bien comenzemos el juego :)"
     return player_s
   end
@@ -123,7 +119,6 @@ class TicTacToe
     loop do
       puts "Dame las coordenadas de tu jugada #{player.nombre.capitalize}"
       turno = gets.chomp.downcase.split(",") #Captura las coordenadas del jugador, elimina el salto de linea, cambia los caracteres a minusculas y los separa en un el arreglo turno
-      #mover a main
       valid = turn_valid? turno
       break if valid
       unless valid
@@ -138,16 +133,16 @@ class TicTacToe
       return false
     else
       #Validacion en caso de que ingrese primero la fila y despues la columna
-      if turno[0] == "a" || turno[0] == "b" || turno[0] == "c"
-        if turno[1] == "1" || turno[1] == "2" || turno[1] == "3"
+      if ("a".."z").member?(turno[0])
+        if ("1".."26").member?(turno[1])
           return true
         else
           return false
         end
       else
         #Validacion en caso de que ingrese primero la columna y despues la fila
-        if turno[0] == "1" || turno[0] == "2" || turno[0] == "3"
-          if turno[1] == "a" || turno[1] == "b" || turno[1] == "c"
+        if ("1".."26").member?(turno[0])
+          if ("a".."z").member?(turno[1])
             return true
           else
             return false
@@ -160,23 +155,22 @@ class TicTacToe
   end
 
   def insert_play_on_board(player, turno)
+    row_pos = 0
     if turno[0].to_i == 0
       ("a".."z").each_with_index do |letra, i|
-        if turno[0] = letra
+        if turno[0] == letra
           row_pos = i
         end
       end
     else
       ("a".."z").each_with_index do |letra, i|
-        if turno[1] = letra
+        if turno[1] == letra
           row_pos = i
         end
       end
-      #row_pos = turno[1] == "a" ? 0 : turno[1] == "b" ? 1 : turno[1] == "c" ? 2 : 3
     end
     col_pos = (turno[0].to_i != 0 ? turno[0].to_i : turno[1].to_i) - 1
-
-    unless @tablero.component(row_pos, col_pos) != ""
+    unless @tablero.component(row_pos, col_pos) != " "
       @tablero.send(:[]=, row_pos, col_pos, player.ficha)
       return true
     else
@@ -186,25 +180,39 @@ class TicTacToe
   end
 
   def print_board
-    print "   1   2   3\n"
-    print "A  #{@tablero.component(0, 0)}  | #{@tablero.component(0, 1)}  | #{@tablero.component(0, 2)}  \n"
-    print "  ---|---|---\n"
-    print "B  #{@tablero.component(1, 0)}  | #{@tablero.component(1, 1)}  | #{@tablero.component(1, 2)}  \n"
-    print "  ---|---|---\n"
-    print "C  #{@tablero.component(2, 0)}  | #{@tablero.component(2, 1)}  | #{@tablero.component(2, 2)}  \n"
+    @tablero.row_vectors().each_with_index { |row, i|
+      print "#{row.component(i)}\n"
+    }
+    #Imprime los numeros de las columnas
+    (1..@tablero.row_vectors.size).each { |n|
+      print "  #{n}  "
+    }
+    puts
+    letras = ("A".."Z").to_a
+    (0...@tablero.row_vectors.size).each do |i|
+      print "#{letras[i]} "
+      @tablero.row_vectors()[i].each do |fila|
+        print " #{fila} | "
+      end
+      puts
+      print " ----" * @tablero.row_count
+      puts
+    end
   end
 
   def full_board?
     blank_space = false
     @tablero.each do |n|
-      if n == ""
-        puts "blank"
+      if n == " "
         blank_space = true
-      else
-        puts n
       end
     end
     blank_space ? false : true
+  end
+
+  def reset_board
+    @tablero = @tablero.map { |a| a = " " }
+    puts "tablero reseteado #{@tablero}"
   end
 
   def match()
@@ -230,38 +238,17 @@ class TicTacToe
     end
   end
 
-  #  private
+  private
 
   def look_for_a_match(array)
-    puts "\n\nAnalizar el #{array}\n\n"
     tree_match = false
     array.each do |x|
-      print "Value:#{x}"
-
-      #Checar si se puede hacer con un x.each y con la funcion de match()
-      #o recorrer el arreglo y si sale uno que no sea igual que truene si al finalizar encontro uno diferente
-
-      if x[0] == x[1] && x[0] != "" #&& x[1]!=""
-        if x[1] == x[2]
-          return true
-        else
-          tree_match = false
+      (1...x.size).each do |i|
+        if x[0] != x[i] || x[i] == " "
+          return false
         end
-      else
-        tree_match = false
       end
+      return true
     end
-    return tree_match
   end
 end
-
-#print "\t\n #{x[0]}, #{x[1]}, #{x[2]}\n"
-# print "\t\n\n\n #{x[0]}, #{x[1]}, #{x[2]}\n\n\n"
-
-#@tablero = Matrix[["x", "", ""], ["", "o", ""], ["", "", ""]]
-#["x", "", ""]
-#["", "o", ""]
-#["", "", ""]
-#game = TicTacToe.new
-
-#game.turn_capture
