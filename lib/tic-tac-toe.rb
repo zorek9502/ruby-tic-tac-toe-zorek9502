@@ -15,11 +15,8 @@ require_relative "player"
 
 class TicTacToe
   @tablero
-  attr_reader :cruz, :bola
 
   def initialize(n)
-    @cruz = "X"
-    @bola = "O"
     @tablero = Matrix.build(n) { " " }
   end
 
@@ -154,15 +151,17 @@ class TicTacToe
     end
   end
 
+  #Funcion para verificar si se puede insertar el turno en el tablero yde ser asi lo inserta
   def insert_play_on_board(player, turno)
     row_pos = 0
+    #Verifica si el primer caracter del turno es letra, si si se obtiene su equivalente en numero siendo a = 0 y z = 26
     if turno[0].to_i == 0
       ("a".."z").each_with_index do |letra, i|
         if turno[0] == letra
           row_pos = i
         end
       end
-    else
+    else #Si el primer caracter no fue letra significa que es numero y se procede a obtener el equivalente de la letra
       ("a".."z").each_with_index do |letra, i|
         if turno[1] == letra
           row_pos = i
@@ -170,6 +169,7 @@ class TicTacToe
       end
     end
     col_pos = (turno[0].to_i != 0 ? turno[0].to_i : turno[1].to_i) - 1
+    #Se pregunta que amenos que el espacio donde se piensa colocar la ficha sea un lugar vacio se inserta si no se descarta
     unless @tablero.component(row_pos, col_pos) != " "
       @tablero.send(:[]=, row_pos, col_pos, player.ficha)
       return true
@@ -179,6 +179,7 @@ class TicTacToe
     end
   end
 
+  #Funcion para pintar el tablero
   def print_board
     @tablero.row_vectors().each_with_index { |row, i|
       print "#{row.component(i)}\n"
@@ -188,6 +189,7 @@ class TicTacToe
       print "  #{n}  "
     }
     puts
+    #Imprime las letras de las filas
     letras = ("A".."Z").to_a
     (0...@tablero.row_vectors.size).each do |i|
       print "#{letras[i]} "
@@ -200,6 +202,7 @@ class TicTacToe
     end
   end
 
+  #Funcion que regresa true si existe un espacio en blanco o false si no se encontraron espacios en blanco
   def full_board?
     blank_space = false
     @tablero.each do |n|
@@ -210,27 +213,30 @@ class TicTacToe
     blank_space ? false : true
   end
 
+  #Funcion para limpiar el tablero de juego
   def reset_board
     @tablero = @tablero.map { |a| a = " " }
     puts "tablero reseteado #{@tablero}"
   end
 
+  #Funcion para buscar match
   def match()
-    array_rows = @tablero.row_vectors()
-    array_cols = @tablero.column_vectors()
+    array_rows = @tablero.row_vectors() #Obtiene un array con todas las filas del tablero
+    array_cols = @tablero.column_vectors()  #Obtiene un array con todas las columnas del tablero
     diagonal1 = []
     diagonal2 = []
     diagonals = []
-    #Diagonal normal
+    #Obtiene la diagonal normal
     (0...@tablero.row_vectors.length).each do |i|
       diagonal1.push(@tablero.component(i, i))
     end
-    #Diagonal invertida
+    #Obtiene la diagonal invertida
     (0...@tablero.row_vectors.length).each do |i|
       diagonal2.push(@tablero.component(i, @tablero.row_vectors.length - i - 1))
     end
-    diagonals.push(diagonal1, diagonal2)
+    diagonals.push(diagonal1, diagonal2) #Los arrays de las diagonales se asignan a otro array
 
+    #Se pregunta si existe algun match en filas o columnas o en las diagonales, si si regresa true
     if look_for_a_match(array_rows) || self.look_for_a_match(array_cols) || self.look_for_a_match(diagonals)
       return true
     else
@@ -240,6 +246,7 @@ class TicTacToe
 
   private
 
+  #Funcion que se encarga de buscar un match en el arreglo que recibe
   def look_for_a_match(array)
     tree_match = false
     array.each do |x|
