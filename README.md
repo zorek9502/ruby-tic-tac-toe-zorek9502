@@ -24,8 +24,7 @@ In order to practice what we have learned regarding OOP and best practices, let'
   Create GUI interface (Shoes or Gosu)
   Create web app 
   Create API
-
-###How execute the game
--Use the following command: bundle exec ruby '.\lib\main.rb'
--Let the game guide you.
--Have fun!
+##How execute the game
+  -Use the following command: bundle exec ruby '.\lib\main.rb'
+  -Let the game guide you.
+  -Have fun!
