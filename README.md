@@ -26,6 +26,6 @@ In order to practice what we have learned regarding OOP and best practices, let'
   Create API
 
 ## How execute the game
-  -Use the following command: bundle exec ruby '.\lib\main.rb'
-  -Let the game guide you.
-  -Have fun!
+  - Use the following command: bundle exec ruby '.\lib\main.rb'
+  - Let the game guide you.
+  - Have fun!
